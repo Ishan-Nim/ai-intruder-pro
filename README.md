@@ -1,5 +1,6 @@
 # AI Intruder Pro
-<img width="200" height="50" alt="4adce9d6-5e91-4d05-8fe3-86658575fa47" src="https://github.com/user-attachments/assets/280e4cc3-9f6e-42a1-bce9-1717c87e6f4e" />
+<img width="1536" height="1024" alt="c58bd6b5-84cb-4cf4-bddf-1c978a5c381d" src="https://github.com/user-attachments/assets/d9ff88a4-eccb-478c-9fc5-6a0b4890305c" />
+
 
 
 **An AI-augmented Burp Suite that lives *inside* your browser.** No proxy, no CA certificate — turn it
