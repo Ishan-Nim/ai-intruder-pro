@@ -1,5 +1,6 @@
 # AI Intruder Pro
-<img width="1536" height="1024" alt="c58bd6b5-84cb-4cf4-bddf-1c978a5c381d" src="https://github.com/user-attachments/assets/d9ff88a4-eccb-478c-9fc5-6a0b4890305c" />
+<img width="1536" height="1024" alt="c58bd6b5-84cb-4cf4-bddf-1c978a5c381d (1)" src="https://github.com/user-attachments/assets/1c7c576f-24cb-483d-9f3f-d3dc85db195d" />
+
 
 
 
