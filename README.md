@@ -14,6 +14,25 @@ Chrome / Edge extension · Manifest V3 · **v3.0.6**
 
 ---
 
+## Screenshots
+
+**HTTP history + passive heuristics** — every request captured as you browse, with per-request findings
+(here: a reflected `ver` parameter flagged for XSS/injection testing).
+
+![HTTP history and heuristics](screenshots/http-history-heuristics.png)
+
+**AI Analysis** — one click sends the selected transaction to DeepSeek for a structured review: summary,
+findings, and concrete suggested manual tests.
+
+![AI analysis with DeepSeek](screenshots/ai-analysis.png)
+
+**Settings** — API key, scope, resource-type/URL exclude filters, theme, outbound rate limit, and OOB
+domain. Everything is stored locally; the API key is only sent to DeepSeek when you run an analysis.
+
+![Settings](screenshots/settings.png)
+
+---
+
 ## Why it's different
 
 Proxy tools (Burp, Caido, ZAP) own the network layer. This tool's edge is that it runs **in the page** —
