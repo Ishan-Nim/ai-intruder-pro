@@ -1,9 +1,13 @@
 # AI Intruder Pro
+<img width="2172" height="724" alt="4adce9d6-5e91-4d05-8fe3-86658575fa47" src="https://github.com/user-attachments/assets/280e4cc3-9f6e-42a1-bce9-1717c87e6f4e" />
+
 
 **An AI-augmented Burp Suite that lives *inside* your browser.** No proxy, no CA certificate — turn it
 on, browse the target normally, and it passively captures every request/response, lets you intercept and
 rewrite traffic, fuzz with an AI Intruder, scan the live DOM and JS, run multi-session IDOR tests, and
 turn loose a constrained AI testing agent. All analysis is powered by the **DeepSeek API**.
+<img width="1536" height="1024" alt="7d4ee23c-e47d-4cd4-811a-0ddc9c2bf593" src="https://github.com/user-attachments/assets/79f822da-6591-487a-8df9-2261c6229f87" />
+
 
 Chrome / Edge extension · Manifest V3 · **v3.0.6**
 
