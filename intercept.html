@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Intercept — AI Intruder Pro</title>
+<script src="theme.js"></script>
+<style>
+  :root { --bg:#14161c; --panel:#1c1f27; --panel2:#0f1117; --txt:#e6e6e6; --muted:#9aa0aa; --orange:#ff7900; --line:#2a2e38; --green:#4caf50; --red:#e05252; }
+  :root[data-theme="light"]{ --bg:#f4f5f7; --panel:#fff; --panel2:#eaecf0; --txt:#1b1e24; --muted:#5b626f; --line:#d9dde4; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--txt); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  .bar { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--line); background:var(--panel); }
+  .bar h1 { font-size:14px; margin:0; flex:0 0 auto; }
+  .state { font-size:12px; font-weight:600; padding:3px 10px; border-radius:20px; }
+  .state.on { background:#3a2a0a; color:#ffb454; } .state.off { background:#2a2e38; color:var(--muted); }
+  .count { font-size:12px; color:var(--muted); }
+  .grow { flex:1; }
+  .switch { position:relative; width:48px; height:25px; flex:0 0 auto; }
+  .switch input { display:none; }
+  .slider { position:absolute; inset:0; background:#3a3f4b; border-radius:25px; cursor:pointer; transition:.2s; }
+  .slider:before { content:""; position:absolute; height:19px; width:19px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider { background:var(--orange); }
+  input:checked + .slider:before { transform:translateX(23px); }
+  button { border:none; border-radius:7px; padding:8px 14px; font-size:13px; font-weight:600; cursor:pointer; }
+  .btn-fwd { background:var(--orange); color:#1a1a1a; } .btn-drop { background:#3a1c1c; color:#ff9a9a; } .btn-g { background:var(--panel2); color:var(--txt); border:1px solid var(--line); }
+  .main { flex:1; display:flex; min-height:0; }
+  .queue { width:240px; border-right:1px solid var(--line); overflow:auto; background:var(--panel); }
+  .qitem { padding:9px 12px; border-bottom:1px solid var(--line); cursor:pointer; font-size:12px; }
+  .qitem:hover { background:var(--panel2); }
+  .qitem.sel { background:#2a2233; border-left:3px solid var(--orange); padding-left:9px; }
+  .qitem .m { font-weight:700; } .qitem .p { color:var(--muted); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:2px; }
+  @keyframes flash { from { background:#3a2a0a; } to { background:transparent; } }
+  .qitem.new { animation:flash 1s ease-out; }
+  .detail { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .reqline { padding:12px 16px; border-bottom:1px solid var(--line); font-family:ui-monospace,monospace; font-size:13px; word-break:break-all; background:var(--panel2); }
+  .reqline .mm { color:var(--orange); font-weight:700; }
+  .editwrap { flex:1; padding:12px 16px; display:flex; flex-direction:column; min-height:0; }
+  textarea { flex:1; width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:8px; padding:12px; font-family:ui-monospace,monospace; font-size:13px; line-height:1.5; resize:none; }
+  .actions { display:flex; gap:10px; align-items:center; padding:12px 16px; border-top:1px solid var(--line); background:var(--panel); }
+  .hint { font-size:11px; color:var(--muted); }
+  .empty { flex:1; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:14px; text-align:center; padding:30px; }
+  kbd { background:var(--panel2); border:1px solid var(--line); border-radius:4px; padding:1px 5px; font-size:11px; font-family:ui-monospace,monospace; }
+</style>
+</head>
+<body>
+  <div class="bar">
+    <h1>Intercept</h1>
+    <label class="switch"><input type="checkbox" id="toggle"><span class="slider"></span></label>
+    <span class="state off" id="state">OFF</span>
+    <span class="count" id="count"></span>
+    <span class="grow"></span>
+    <span class="hint"><kbd>F</kbd> forward · <kbd>D</kbd> drop · <kbd>A</kbd> all · <kbd>J/K</kbd> move · <kbd>Ctrl+↵</kbd> forward edited</span>
+    <button class="btn-g" id="forwardAll">Forward all</button>
+  </div>
+  <div class="bar" style="padding:6px 14px;font-size:12px;gap:18px;">
+    <span style="color:var(--muted)">Hold:</span>
+    <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="holdAll" style="width:auto"> all request types <span class="hint">(default: Document / XHR / Fetch only)</span></label>
+    <label style="display:flex;gap:6px;align-items:center;cursor:pointer"><input type="checkbox" id="holdOptions" style="width:auto"> include OPTIONS preflight</label>
+  </div>
+  <div class="main">
+    <div class="queue" id="queue"></div>
+    <div class="detail" id="detail">
+      <div class="empty" id="empty">Intercept is off. Toggle it on (with capture running) and matching requests will appear here, held until you forward or drop them.</div>
+      <div id="focusView" style="display:none;flex:1;flex-direction:column;min-height:0;">
+        <div class="reqline" id="reqline"></div>
+        <div class="editwrap"><textarea id="editor" spellcheck="false"></textarea></div>
+        <div class="actions">
+          <button class="btn-fwd" id="fwdBtn">Forward →</button>
+          <button class="btn-drop" id="dropBtn">Drop ✕</button>
+          <span class="hint" id="editHint">Edit the raw request above before forwarding.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="intercept.js"></script>
+</body>
+</html>

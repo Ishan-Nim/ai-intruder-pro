@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "AI Intruder Pro \u2014 Proxy, Intercept, Scanner & Agent",
+  "version": "3.0.6",
+  "description": "Capture & intercept HTTP traffic, run match/replace rules, an AI Intruder, client-side & JS scanning, multi-session IDOR, and an AI testing agent \u2014 analyzed with DeepSeek.",
+  "permissions": [
+    "debugger",
+    "storage",
+    "unlimitedStorage",
+    "tabs",
+    "activeTab",
+    "alarms",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "AI Intruder Pro",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "options_page": "options.html",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

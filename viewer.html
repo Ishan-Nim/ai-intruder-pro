@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>AI Intruder Pro — Analyzer</title>
+<style>
+  :root { --bg:#14161c; --panel:#1c1f27; --panel2:#0f1117; --txt:#e6e6e6; --muted:#9aa0aa;
+          --orange:#ff7900; --line:#2a2e38; --green:#4caf50; --red:#e05252; --yellow:#e0b020; }
+  :root[data-theme="light"]{ --bg:#f4f5f7; --panel:#ffffff; --panel2:#eaecf0; --txt:#1b1e24; --muted:#5b626f; --line:#d9dde4; --green:#1f8b3b; --red:#c0392b; --yellow:#b07d00; }
+  [data-theme="light"] mark{ background:#ffe9b3; color:#5a3a00; }
+  [data-theme="light"] .banner{ background:#fff3e0; color:#8a5a00; }
+  [data-theme="light"] .restab tr.hit{ background:#fff4e0; }
+  [data-theme="light"] .flag{ background:#ffe2b0; color:#7a4b00; }
+  [data-theme="light"] .dotsev.s-none{ background:#c4c8d0; }
+  [data-theme="light"] .modal .box{ background:#ffffff; }
+  [data-theme="light"] tr.sel{ background:#ffe9d0; }
+  [data-theme="light"] tr:hover{ background:#f0f2f6; }
+  [data-theme="light"] .sev.high,[data-theme="light"] .sev.critical{ background:#fde2e2; color:#b3261e; }
+  [data-theme="light"] .sev.medium{ background:#fdf0d0; color:#8a5a00; }
+  [data-theme="light"] .sev.low{ background:#dff3e8; color:#1f6b45; }
+  [data-theme="light"] .sev.info{ background:#e1ecfa; color:#1b5fb0; }
+  [data-theme="light"] .sev.error{ background:#fde2e2; color:#b3261e; }
+  [data-theme="light"] .ai-out strong{ color:#000; }
+
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:-apple-system,Segoe UI,Roboto,sans-serif; background:var(--bg); color:var(--txt); height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+  header { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--line); background:var(--panel); flex:0 0 auto; flex-wrap:wrap; }
+  header img { width:24px; height:24px; } header h1 { font-size:15px; margin:0; }
+  header .grow { flex:1; }
+  input.search { width:240px; padding:7px 10px; background:var(--panel2); border:1px solid var(--line); border-radius:6px; color:var(--txt); font-size:13px; }
+  button { border:none; border-radius:6px; padding:7px 12px; font-size:12px; font-weight:600; cursor:pointer; }
+  .btn-o { background:var(--orange); color:#1a1a1a; } .btn-g { background:var(--panel2); color:var(--txt); border:1px solid var(--line); }
+  .btn-sm { padding:4px 8px; font-size:11px; }
+  .banner { background:#2a1d0a; color:#ffd9a0; font-size:11px; padding:6px 16px; border-bottom:1px solid var(--line); }
+  .main { flex:1; display:flex; min-height:0; }
+  .list { width:44%; border-right:1px solid var(--line); overflow:auto; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  th { position:sticky; top:0; background:var(--panel); text-align:left; padding:7px 8px; color:var(--muted); font-weight:600; border-bottom:1px solid var(--line); z-index:1; }
+  td { padding:6px 8px; border-bottom:1px solid var(--line); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:0; }
+  tr { cursor:pointer; } tr:hover { background:#20242e; } tr.sel { background:#2a2233; }
+  .method { font-weight:700; }
+  .m-GET{color:#6db3ff} .m-POST{color:var(--orange)} .m-PUT,.m-PATCH{color:var(--yellow)} .m-DELETE{color:var(--red)}
+  .st-2{color:var(--green)} .st-3{color:#6db3ff} .st-4{color:var(--yellow)} .st-5{color:var(--red)}
+  .dotsev { display:inline-block; width:9px; height:9px; border-radius:50%; }
+  .s-high,.s-critical{background:#ff6060} .s-medium{background:#ffd060} .s-low{background:#80e0b0} .s-info{background:#80c0ff} .s-none{background:#333}
+  .detail { flex:1; display:flex; flex-direction:column; min-width:0; }
+  .tabs { display:flex; gap:2px; padding:8px 12px 0; border-bottom:1px solid var(--line); background:var(--panel); flex-wrap:wrap; }
+  .tab { padding:7px 12px; font-size:12px; cursor:pointer; color:var(--muted); border-bottom:2px solid transparent; }
+  .tab.active { color:var(--orange); border-bottom-color:var(--orange); }
+  .tab .dot { display:inline-block; min-width:16px; padding:0 4px; margin-left:4px; font-size:10px; background:var(--orange); color:#1a1a1a; border-radius:8px; text-align:center; }
+  .pane { flex:1; overflow:auto; padding:12px 16px; display:none; } .pane.active { display:block; }
+  pre { white-space:pre-wrap; word-break:break-word; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; line-height:1.5; margin:0; }
+  mark { background:#5a3a00; color:#ffd9a0; padding:0 2px; border-radius:2px; }
+  textarea { width:100%; background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:10px; font-family:ui-monospace,monospace; font-size:12px; }
+  .finding { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin-bottom:8px; background:var(--panel); }
+  .finding .t { font-weight:600; font-size:13px; } .finding .d { color:var(--muted); font-size:12px; margin-top:3px; }
+  .sev { font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; text-transform:uppercase; margin-right:8px; }
+  .sev.high,.sev.critical{ background:#3a1414; color:#ff8080; } .sev.medium{ background:#3a3014; color:#ffd060; }
+  .sev.low{ background:#143a2a; color:#80e0b0; } .sev.info{ background:#1a2a3a; color:#80c0ff; } .sev.error{ background:#3a1414; color:#ff8080; }
+  .ai-out { background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:14px 16px; font-size:13px; line-height:1.6; }
+  .ai-out h2{ font-size:14px; color:var(--orange); margin:14px 0 6px; } .ai-out h2:first-child{margin-top:0;}
+  .ai-out code{ background:var(--panel2); padding:1px 5px; border-radius:4px; font-family:ui-monospace,monospace; }
+  .ai-out strong{ color:#fff; } .ai-out li{ margin:3px 0; }
+  .empty { color:var(--muted); padding:40px; text-align:center; font-size:13px; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--line); border-top-color:var(--orange); border-radius:50%; animation:spin .7s linear infinite; vertical-align:middle; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .toolbar { padding:10px 16px; border-bottom:1px solid var(--line); display:flex; gap:8px; align-items:center; justify-content:space-between; }
+  .url { font-size:12px; color:var(--muted); word-break:break-all; }
+  .ctl { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:10px 0; font-size:12px; }
+  .ctl label { color:var(--muted); } .ctl input,.ctl select { background:var(--panel2); color:var(--txt); border:1px solid var(--line); border-radius:6px; padding:5px 7px; font-size:12px; }
+  .ctl input.num { width:64px; }
+  .restab { width:100%; border-collapse:collapse; font-size:12px; margin-top:10px; }
+  .restab th,.restab td { padding:5px 8px; border-bottom:1px solid var(--line); text-align:left; }
+  .restab tr.hit { background:#2a2010; } .restab tr { cursor:pointer; }
+  .flag { font-size:10px; padding:1px 6px; border-radius:8px; background:#3a3014; color:#ffd060; margin-right:4px; }
+  .progress { font-size:12px; color:var(--muted); margin-left:8px; }
+  .modal { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; align-items:center; justify-content:center; z-index:10; }
+  .modal.open { display:flex; }
+  .modal .box { width:min(820px,90vw); max-height:85vh; overflow:auto; background:var(--bg); border:1px solid var(--line); border-radius:12px; padding:20px 24px; }
+  .modal .box h2.title { margin:0 0 12px; font-size:16px; }
+  .close { float:right; cursor:pointer; color:var(--muted); }
+  .hidden { display:none; }
+</style>
+<script src="theme.js"></script>
+</head>
+<body>
+  <header>
+    <img src="icons/icon48.png" alt=""><h1>AI Intruder Pro</h1>
+    <input class="search" id="search" placeholder="Filter URL / method / status…">
+    <span class="grow"></span>
+    <button class="btn-g" id="interceptBtn">Intercept</button>
+    <button class="btn-g" id="rulesBtn">Rules</button>
+    <button class="btn-g" id="scanBtn">Scan page</button>
+    <button class="btn-g" id="sessionsBtn">Sessions</button>
+    <button class="btn-g" id="comparerBtn">Comparer</button>
+    <button class="btn-g" id="encoderBtn">Encoder</button>
+    <button class="btn-g" id="reportBtn">Report</button>
+    <button class="btn-g" id="siteAnalyze">Site analysis</button>
+    <button class="btn-g" id="exportHar">Export HAR</button>
+    <button class="btn-g" id="importHar">Import HAR</button>
+    <input type="file" id="harFile" accept=".har,application/json" class="hidden">
+    <button class="btn-g" id="refresh">Refresh</button>
+    <button class="btn-g" id="theme" title="Toggle light/dark">◐</button>
+    <button class="btn-g" id="settings">Settings</button>
+    <button class="btn-g" id="clear">Clear all</button>
+  </header>
+  <div class="banner">For authorized testing only. Capture, scan, and run the Intruder solely on systems you own or have written permission to test. The Intruder sends live requests.</div>
+  <div class="main">
+    <div class="list">
+      <table>
+        <thead><tr><th style="width:18px"></th><th style="width:54px">Method</th><th>URL</th><th style="width:50px">Status</th><th style="width:64px">Type</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <div class="empty" id="listEmpty">No requests captured yet.<br>Turn capture on from the toolbar icon and browse the target.</div>
+    </div>
+    <div class="detail">
+      <div class="toolbar"><span class="url" id="curUrl">Select a request</span></div>
+      <div class="tabs">
+        <div class="tab active" data-pane="req">Request</div>
+        <div class="tab" data-pane="resp">Response</div>
+        <div class="tab" data-pane="heur">Heuristics <span class="dot" id="heurCount" style="display:none">0</span></div>
+        <div class="tab" data-pane="ai">AI Analysis</div>
+        <div class="tab" data-pane="intruder">Intruder</div>
+        <div class="tab" data-pane="agent">AI Agent</div>
+        <div class="tab" data-pane="rep">Repeater</div>
+      </div>
+
+      <div class="pane active" id="pane-req">
+        <button class="btn-g btn-sm" id="copyReq">Copy</button>
+        <pre id="reqRaw" style="margin-top:8px"></pre>
+      </div>
+      <div class="pane" id="pane-resp">
+        <button class="btn-g btn-sm" id="copyResp">Copy</button>
+        <pre id="respRaw" style="margin-top:8px"></pre>
+      </div>
+      <div class="pane" id="pane-heur"><div id="heurList"></div></div>
+      <div class="pane" id="pane-ai">
+        <button class="btn-o" id="analyze">Analyze with DeepSeek</button>
+        <div id="aiResult" style="margin-top:14px"></div>
+      </div>
+
+      <div class="pane" id="pane-intruder">
+        <p class="url">Mark insertion points by wrapping text in <code>§ §</code>. Select text in the template and click <b>Mark §</b>. All marked spots get the same payload per request (battering-ram).</p>
+        <div class="ctl">
+          <button class="btn-g btn-sm" id="seedTpl">Reset template from request</button>
+          <button class="btn-g btn-sm" id="markSel">Mark §</button>
+        </div>
+        <textarea id="intrTpl" style="min-height:150px"></textarea>
+        <div class="ctl">
+          <label>Payloads:</label>
+          <select id="payloadCat"></select>
+          <button class="btn-g btn-sm" id="loadBuiltin">Load built-in</button>
+          <button class="btn-o btn-sm" id="genAi">Generate with AI</button>
+          <label>Grep match:</label><input id="grep" placeholder="optional string">
+        </div>
+        <textarea id="payloadList" placeholder="One payload per line…" style="min-height:90px"></textarea>
+        <div class="ctl">
+          <label>Delay ms</label><input class="num" id="delay" type="number" value="150" min="0">
+          <label>Concurrency</label><input class="num" id="conc" type="number" value="3" min="1" max="10">
+          <button class="btn-o" id="runIntr">Start attack</button>
+          <button class="btn-g" id="stopIntr" disabled>Stop</button>
+          <span class="progress" id="intrProgress"></span>
+          <button class="btn-g btn-sm" id="triage" disabled>AI triage results</button>
+        </div>
+        <div id="intrResults"></div>
+        <div id="triageOut" style="margin-top:12px"></div>
+      </div>
+
+      <div class="pane" id="pane-agent">
+        <p class="url">An AI agent probes the selected request's target with safe, scope-enforced requests. State-changing verbs (POST/PUT/DELETE) require your confirmation. Authorized targets only.</p>
+        <div class="ctl">
+          <label>Max steps</label><input class="num" id="agentSteps" type="number" value="6" min="1" max="20">
+          <button class="btn-o" id="runAgent">Run agent</button>
+        </div>
+        <div id="agentOut" style="margin-top:12px"></div>
+      </div>
+
+      <div class="pane" id="pane-rep">
+        <p class="url">Edit the raw request, then resend. Format: "METHOD URL" line, "Header: value" lines, blank line, then body.</p>
+        <div class="ctl">
+          <label>Session</label>
+          <select id="repSession"><option value="">(current browser session)</option></select>
+          <button class="btn-g btn-sm" id="applySession">Apply to request</button>
+        </div>
+        <textarea id="repInput" style="min-height:200px"></textarea>
+        <div style="margin-top:10px"><button class="btn-o" id="sendRep">Send</button></div>
+        <div id="repResult" style="margin-top:14px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal">
+    <div class="box">
+      <span class="close" id="modalClose">✕ close</span>
+      <h2 class="title" id="modalTitle">Site analysis</h2>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <script src="payloads.js"></script>
+  <script src="tools.js"></script>
+  <script src="analyzer.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>

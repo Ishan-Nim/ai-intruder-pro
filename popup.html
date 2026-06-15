@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  :root { --bg:#14161c; --panel:#1c1f27; --txt:#e6e6e6; --muted:#9aa0aa; --orange:#ff7900; --line:#2a2e38; }
+  :root[data-theme="light"]{ --bg:#f4f5f7; --panel:#ffffff; --panel2:#eaecf0; --txt:#1b1e24; --muted:#5b626f; --line:#d9dde4; --green:#1f8b3b; --red:#c0392b; --yellow:#b07d00; }
+  * { box-sizing:border-box; font-family:-apple-system,Segoe UI,Roboto,sans-serif; }
+  body { width:300px; margin:0; background:var(--bg); color:var(--txt); }
+  header { display:flex; align-items:center; gap:8px; padding:12px 14px; border-bottom:1px solid var(--line); }
+  header img { width:22px; height:22px; }
+  header h1 { font-size:14px; margin:0; font-weight:600; }
+  .body { padding:14px; }
+  .row { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .switch { position:relative; width:50px; height:26px; }
+  .switch input { display:none; }
+  .slider { position:absolute; inset:0; background:#3a3f4b; border-radius:26px; transition:.2s; cursor:pointer; }
+  .slider:before { content:""; position:absolute; height:20px; width:20px; left:3px; top:3px; background:#fff; border-radius:50%; transition:.2s; }
+  input:checked + .slider { background:var(--orange); }
+  input:checked + .slider:before { transform:translateX(24px); }
+  .stat { font-size:12px; color:var(--muted); } .stat b { color:var(--txt); font-size:13px; }
+  button { width:100%; padding:10px; border:none; border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; margin-top:8px; }
+  .primary { background:var(--orange); color:#1a1a1a; }
+  .ghost { background:var(--panel); color:var(--txt); border:1px solid var(--line); }
+  .status { font-size:12px; margin-top:4px; } .on { color:var(--orange); } .off { color:var(--muted); }
+  .scope { font-size:11px; color:var(--muted); margin-bottom:12px; }
+</style>
+<script src="theme.js"></script>
+</head>
+<body>
+  <header><img src="icons/icon48.png" alt=""><h1>AI Intruder Pro</h1></header>
+  <div class="body">
+    <div class="row">
+      <div>
+        <div style="font-size:13px;font-weight:600;">Capture traffic</div>
+        <div class="status off" id="status">Off</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="toggle"><span class="slider"></span></label>
+    </div>
+    <div class="scope" id="scope">Scope: all hosts</div>
+    <div class="row" style="margin-bottom:10px">
+      <div>
+        <div style="font-size:13px;font-weight:600;">Manual intercept</div>
+        <div class="status off" id="iStatus">Off</div>
+      </div>
+      <label class="switch"><input type="checkbox" id="iToggle"><span class="slider"></span></label>
+    </div>
+    <div class="row"><span class="stat">Captured requests</span><span class="stat"><b id="count">0</b></span></div>
+    <button class="primary" id="open">Open analyzer</button>
+    <button class="ghost" id="options">Settings &amp; scope</button>
+    <button class="ghost" id="clear">Clear captured</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>
